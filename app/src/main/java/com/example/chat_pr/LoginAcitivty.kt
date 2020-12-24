@@ -4,8 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.activity_login.*
 
 
 class LoginAcitivty : AppCompatActivity() {
@@ -16,9 +18,7 @@ class LoginAcitivty : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         auth = FirebaseAuth.getInstance()
-        val login_pwd: EditText = findViewById(R.id.login_pwd)
-        val login_email: EditText = findViewById(R.id.email_area)
-        val login_button: EditText = findViewById(R.id.login_email)
+
 
         login_button.setOnClickListener() {
             val email = login_email.text.toString()
@@ -29,22 +29,20 @@ class LoginAcitivty : AppCompatActivity() {
 
 
                     if (task.isSuccessful) {
-                        Log.d(TAG, "로그인성공")
+                        Log.d(TAG, "success")
+                        Toast.makeText(this@LoginAcitivty, "로그인성공!", Toast.LENGTH_SHORT).show()
+
+                        //데이터베이스에 유저 정보 입력
+
+
+                       val intent = Intent(this, ChatListAcitivty::class.java)
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
                     } else {
-                        Log.d(TAG, "로그인 실패", task.exception)
+                        Log.d(TAG, "fallure", task.exception)
+                        Toast.makeText(this@LoginAcitivty, "로그인 실패..", Toast.LENGTH_SHORT).show()
                     }
-//                    try {
-//                        if (task.isSuccessful) {
-//                            Log.d(TAG, "로그인성공")
-//                        } else {
-//                            Log.d(TAG, "로그인 실패", task.exception)
-//                        }
-//                    } catch (e: Exception) { //만약 null 값이 들어간다면 화면을 갱신해 다시 로그인 할 수 있게 해준다.
-//                        if (email == null || password == null || email == null && password == null) {
-//                            val intent = Intent(this, LoginAcitivty::class.java)
-//                            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-//                            startActivity(intent)
-//                        }
                 }
 
 
