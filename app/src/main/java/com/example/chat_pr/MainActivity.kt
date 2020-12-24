@@ -1,5 +1,6 @@
 package com.example.chat_pr
 
+import Model.User
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -19,9 +22,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         auth = FirebaseAuth.getInstance()
-        val join_button: Button = findViewById(R.id.join_button)
-        val email_area: EditText = findViewById(R.id.email_area)
-        val password_area: EditText = findViewById(R.id.password_area)
+
+        login_button_main.setOnClickListener() {
+            val intent = Intent(this, LoginAcitivty::class.java)
+            startActivity(intent)
+        }
+
+
         join_button.setOnClickListener() {
             val email = email_area.text.toString() // 입력 데이터
             val password = password_area.text.toString()
@@ -30,54 +37,42 @@ class MainActivity : AppCompatActivity() {
                 .addOnCompleteListener(this) { task ->
 
                     if (task.isSuccessful) {
-                        Log.d(TAG, "로그인성공")
+                        Log.d(TAG, "회원가입 성공")
+
+                        val uid = FirebaseAuth.getInstance().uid ?: ""
+                        val user = User(uid, username.text.toString())
+                        //데이터베이스 넣음
+                        val db = FirebaseFirestore.getInstance().collection("users")
+                        db.document(uid)
+                            .set(user)
+                            .addOnSuccessListener {
+                                Log.d(TAG, "데이터 베이스 성공")
+                            }
+                            .addOnFailureListener {
+                                Log.d(TAG, "데이터 베이스 실패 $it")
+                            }
+
+
+                        Toast.makeText(this@MainActivity, "회원가입 성공!", Toast.LENGTH_SHORT).show()
+
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+
                     } else {
-                        Log.d(TAG, "로그인 실패", task.exception)
+                        Log.d(TAG, "회원가입 실패", task.exception)
+                        Toast.makeText(this@MainActivity, "회원가입 실패..", Toast.LENGTH_SHORT).show()
                     }
 
-//                    try {
-//
-//                        if (task.isSuccessful) {
-//                            Log.d(TAG, "로그인성공")
-//                            Toast.makeText(this@MainActivity, "로그인 성공", Toast.LENGTH_SHORT).show()
-//                        } else {
-//                            Log.d(TAG, "로그인 실패", task.exception)
-//                            Toast.makeText(this@MainActivity, "로그인 실패", Toast.LENGTH_SHORT).show()
-//                        }
-//
-//                    } catch (e: Exception) { //만약 null 값이라면 화면갱신
-//
-//                        if (task.isSuccessful) {
-//                            Log.d(TAG, "로그인성공")
-//                            Toast.makeText(this@MainActivity, "로그인 성공", Toast.LENGTH_SHORT).show()
-//                        } else {
-//                            Log.d(TAG, "로그인 실패", task.exception)
-//                            Toast.makeText(this@MainActivity, "로그인 실패", Toast.LENGTH_SHORT).show()
-//                            val intent = Intent(this, LoginAcitivty::class.java)
-//                            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-//                            startActivity(intent)
-//                        }
-//
-//
-//                    }
                 }
 
         }
-
-
-        val join: Button = findViewById(R.id.join_button)
-        join.setOnClickListener() {
-            val intent = Intent(this, LoginAcitivty::class.java)
-            startActivity(intent)
-
-
-        }
-        val login_button_main: Button = findViewById(R.id.login_button_main)
-
         login_button_main.setOnClickListener() {
+
             val intent = Intent(this, LoginAcitivty::class.java)
             startActivity(intent)
         }
+
 
     }
 }
