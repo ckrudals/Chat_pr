@@ -11,6 +11,7 @@
         android:theme="@style/Theme.Chat_pr">
         <activity android:name=".LoginAcitivty"/>
         <activity android:name=".ChatListAcitivty"/>
+        <activity android:name=".ChatRommActivity"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
